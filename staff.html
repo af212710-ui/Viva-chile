@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff | Viva Chile RP</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="apple-touch-icon" href="assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="portal.css">
+  <script src="app-config.js"></script>
+  <style>
+    .staff-shell,
+    .staff-top,
+    .staff-main,
+    .staff-search-grid,
+    .staff-results,
+    .staff-stat-grid,
+    .staff-detail-grid,
+    .staff-history-list,
+    .staff-pill-row,
+    .staff-inventory-grid,
+    .staff-inventory-meta {
+      display: grid;
+      gap: 24px;
+    }
+
+    .staff-shell {
+      width: min(100%, 1280px);
+      margin: 0 auto;
+      padding: 34px 20px 56px;
+    }
+
+    .staff-top {
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 420px);
+      align-items: start;
+    }
+
+    .staff-main {
+      grid-template-columns: minmax(340px, 420px) minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .staff-panel,
+    .staff-search-card,
+    .staff-result-card,
+    .staff-shift-card {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+      background: rgba(9, 18, 27, 0.9);
+      box-shadow: 0 26px 70px rgba(0, 0, 0, 0.24);
+      backdrop-filter: blur(14px);
+      padding: 26px;
+    }
+
+    .staff-search-card,
+    .staff-result-card,
+    .staff-shift-card {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .staff-kicker {
+      margin: 0 0 8px;
+      color: #8bf1b2;
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .staff-title {
+      margin: 0;
+      font-family: "Oswald", sans-serif;
+      font-size: clamp(2.6rem, 6vw, 4.8rem);
+      line-height: 0.96;
+    }
+
+    .staff-subtitle,
+    .staff-search-card p,
+    .staff-result-card p,
+    .staff-shift-card p {
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .staff-top-actions,
+    .staff-shift-head,
+    .staff-section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .staff-search-grid {
+      align-content: start;
+    }
+
+    .staff-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .staff-form label {
+      display: grid;
+      gap: 10px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .staff-form input {
+      width: 100%;
+      min-height: 52px;
+      padding: 0 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      background: rgba(4, 10, 15, 0.9);
+      color: var(--text);
+      font: inherit;
+    }
+
+    .staff-form input:focus {
+      outline: none;
+      border-color: rgba(75, 171, 255, 0.8);
+      box-shadow: 0 0 0 1px rgba(75, 171, 255, 0.2);
+    }
+
+    .staff-stat-grid,
+    .staff-detail-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .staff-stat-grid article,
+    .staff-detail-grid article,
+    .staff-list-block {
+      padding: 16px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .staff-stat-grid span,
+    .staff-detail-grid span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .staff-stat-grid strong,
+    .staff-detail-grid strong {
+      display: block;
+      margin-top: 6px;
+      font-family: "Oswald", sans-serif;
+      font-size: 1.3rem;
+      line-height: 1.08;
+      word-break: break-word;
+    }
+
+    .staff-pill-row {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .staff-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .staff-pill.ok {
+      color: #7ef0a8;
+      background: rgba(99, 216, 141, 0.16);
+    }
+
+    .staff-pill.alert {
+      color: #ff9797;
+      background: rgba(239, 90, 90, 0.16);
+    }
+
+    .staff-hours {
+      margin: 0;
+      font-family: "Oswald", sans-serif;
+      font-size: 2.8rem;
+      line-height: 0.95;
+    }
+
+    .staff-feedback.is-error {
+      color: #ef8b8b;
+    }
+
+    .staff-feedback.is-ok {
+      color: #7ef0a8;
+    }
+
+    .staff-history-list article {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .staff-history-list article:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .staff-history-list small {
+      color: var(--muted);
+    }
+
+    .staff-history-list strong {
+      font-family: "Oswald", sans-serif;
+      font-size: 1.2rem;
+    }
+
+    .staff-inventory-grid {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .staff-inventory-item {
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .staff-inventory-media {
+      height: 140px;
+      background: linear-gradient(180deg, rgba(28, 40, 55, 0.8), rgba(15, 24, 34, 0.96));
+      overflow: hidden;
+    }
+
+    .staff-inventory-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .staff-inventory-body {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .staff-inventory-body h4 {
+      margin: 0;
+      font-family: "Oswald", sans-serif;
+      font-size: 1.35rem;
+      line-height: 0.98;
+    }
+
+    .staff-inventory-type {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(93, 184, 255, 0.12);
+      color: #8fcbff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .staff-inventory-meta {
+      gap: 8px;
+    }
+
+    .staff-inventory-meta p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .staff-inventory-empty {
+      margin-top: 12px;
+    }
+
+    @media (max-width: 1080px) {
+      .staff-top,
+      .staff-main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .staff-shell {
+        padding: 20px 16px 48px;
+      }
+
+      .staff-panel,
+      .staff-search-card,
+      .staff-result-card,
+      .staff-shift-card {
+        padding: 22px;
+        border-radius: 24px;
+      }
+
+      .staff-stat-grid,
+      .staff-detail-grid,
+      .staff-inventory-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="staff-shell">
+    <section class="portal-card" data-staff-denied hidden>
+      <p class="portal-kicker">Acceso restringido</p>
+      <h2 style="margin:0;font-family:'Oswald',sans-serif;">No autorizado</h2>
+      <p class="portal-user">Necesitas el rol Departamento Administrativo para entrar a este panel.</p>
+      <a class="portal-button secondary" href="portal.html">Volver al portal</a>
+    </section>
+
+    <section data-staff-view hidden>
+      <section class="staff-top">
+        <article class="staff-panel">
+          <p class="staff-kicker">Departamento Administrativo</p>
+          <h1 class="staff-title">Panel de staff</h1>
+          <p class="staff-subtitle">Revisa personas por nombre, RUT o documento. Valida vehiculos por patente y consulta su estado legal, propietario e informacion de circulacion desde un solo lugar.</p>
+          <div class="staff-top-actions">
+            <a class="portal-button secondary" href="portal.html">Volver al portal</a>
+          </div>
+        </article>
+
+        <aside class="staff-shift-card">
+          <div class="staff-shift-head">
+            <div>
+              <p class="staff-kicker">Registro de horas</p>
+              <h2 class="staff-hours">Gestion desactivada</h2>
+            </div>
+          </div>
+          <p class="portal-feedback staff-feedback">El control de turnos fue retirado para el equipo de staff.</p>
+        </aside>
+      </section>
+
+      <section class="staff-main">
+        <div class="staff-search-grid">
+          <article class="staff-search-card">
+            <p class="staff-kicker">Busqueda de personas</p>
+            <h2 style="margin:0;font-family:'Oswald',sans-serif;">Consulta civil</h2>
+            <p>Usa nombre, RUT o numero de documento para traer la ficha del jugador y revisar su situacion general.</p>
+            <form class="staff-form" data-staff-person-form>
+              <label>
+                Nombre, RUT o documento
+                <input type="text" name="identifier" placeholder="Ej: 12.345.678-K o Marcela Carolina" required>
+              </label>
+              <div class="portal-actions">
+                <button class="portal-button primary" type="submit">Buscar persona</button>
+              </div>
+            </form>
+            <p class="portal-feedback staff-feedback" data-staff-feedback>Esperando una consulta.</p>
+          </article>
+
+          <article class="staff-search-card">
+            <p class="staff-kicker">Busqueda vehicular</p>
+            <h2 style="margin:0;font-family:'Oswald',sans-serif;">Control por patente</h2>
+            <p>Valida rapidamente si un vehiculo esta inscrito, si tiene permiso vigente y si su revision tecnica esta al dia.</p>
+            <form class="staff-form" data-staff-vehicle-form>
+              <label>
+                Patente
+                <input type="text" name="plate" placeholder="Ej: ABC-123" required>
+              </label>
+              <div class="portal-actions">
+                <button class="portal-button primary" type="submit">Buscar vehiculo</button>
+              </div>
+            </form>
+          </article>
+        </div>
+
+        <div class="staff-results">
+          <article class="staff-result-card">
+            <div class="staff-section-head">
+              <div>
+                <p class="staff-kicker">Resultado persona</p>
+                <h2 style="margin:0;font-family:'Oswald',sans-serif;">Ficha general</h2>
+              </div>
+            </div>
+            <div data-staff-person-result>
+              <p class="transaction-empty">Todavia no se ha consultado ninguna persona.</p>
+            </div>
+          </article>
+
+          <article class="staff-result-card">
+            <div class="staff-section-head">
+              <div>
+                <p class="staff-kicker">Resultado vehiculo</p>
+                <h2 style="margin:0;font-family:'Oswald',sans-serif;">Ficha vehicular</h2>
+              </div>
+            </div>
+            <div data-staff-vehicle-result>
+              <p class="transaction-empty">Todavia no se ha consultado ninguna patente.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const allowedView = document.querySelector("[data-staff-view]");
+    const deniedView = document.querySelector("[data-staff-denied]");
+    const staffFeedback = document.querySelector("[data-staff-feedback]");
+    const personResultNode = document.querySelector("[data-staff-person-result]");
+    const vehicleResultNode = document.querySelector("[data-staff-vehicle-result]");
+
+    const formatDate = (value) => {
+      if (!value) return "Sin registro";
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString("es-CL");
+    };
+
+    const formatDuration = (value) => {
+      const total = Math.max(0, Math.floor(Number(value || 0) / 1000));
+      const hours = String(Math.floor(total / 3600)).padStart(2, "0");
+      const minutes = String(Math.floor((total % 3600) / 60)).padStart(2, "0");
+      const seconds = String(total % 60).padStart(2, "0");
+      return `${hours}:${minutes}:${seconds}`;
+    };
+
+    const formatMoney = (value) =>
+      new Intl.NumberFormat("es-CL", {
+        style: "currency",
+        currency: "CLP",
+        maximumFractionDigits: 0,
+      }).format(Number(value || 0));
+
+    const escapeHtml = (value) =>
+      String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
+    function setFeedback(node, message, isError = false) {
+      if (!node) return;
+      node.textContent = message;
+      node.classList.toggle("is-error", Boolean(isError));
+      node.classList.toggle("is-ok", !isError && Boolean(message));
+    }
+
+    function renderPerson(person) {
+      if (!person) {
+        personResultNode.innerHTML = '<p class="transaction-empty">Todavia no se ha consultado ninguna persona.</p>';
+        return;
+      }
+
+      const fullName = `${person.identity?.nombres || ""} ${person.identity?.apellidos || ""}`.trim();
+      const fines = Array.isArray(person.police?.fines) ? person.police.fines : [];
+      const unpaidFines = fines.filter((item) => !item.paid).length;
+      const backgrounds = Array.isArray(person.police?.backgrounds) ? person.police.backgrounds : [];
+      const wanted = Array.isArray(person.police?.wanted_orders) ? person.police.wanted_orders : [];
+      const inventory = Array.isArray(person.bank?.inventory) ? person.bank.inventory : [];
+
+      const inventoryMarkup = inventory.length
+        ? `
+          <div class="staff-inventory-grid">
+            ${inventory.map((item) => {
+              const category = String(item.category || "Articulo");
+              const isVehicle = category.toLowerCase() === "vehiculos";
+              const impounded = Boolean(item.impounded?.active);
+              const legalState = isVehicle
+                ? `${item.registered ? "Inscrito" : "Pendiente de inscripcion"}${impounded ? " · En corrales" : ""}`
+                : "Articulo registrado en inventario";
+              const image = escapeHtml(item.image || "assets/tienda/placeholder-auto.svg");
+              const title = escapeHtml(item.name || "Sin nombre");
+              const badge = escapeHtml(category);
+              const plate = escapeHtml(item.plate || "Sin patente");
+              const color = escapeHtml(item.color || "Sin color");
+              const detail = escapeHtml(legalState);
+              return `
+                <article class="staff-inventory-item">
+                  <div class="staff-inventory-media">
+                    <img src="${image}" alt="${title}" onerror="this.onerror=null;this.src='assets/tienda/placeholder-auto.svg';">
+                  </div>
+                  <div class="staff-inventory-body">
+                    <span class="staff-inventory-type">${badge}</span>
+                    <h4>${title}</h4>
+                    <div class="staff-inventory-meta">
+                      ${isVehicle ? `<p><strong>Patente:</strong> ${plate}</p>` : ""}
+                      ${isVehicle ? `<p><strong>Color:</strong> ${color}</p>` : ""}
+                      <p>${detail}</p>
+                    </div>
+                  </div>
+                </article>
+              `;
+            }).join("")}
+          </div>
+        `
+        : '<p class="transaction-empty staff-inventory-empty">No tiene articulos registrados.</p>';
+
+      personResultNode.innerHTML = `
+        <div class="staff-stat-grid">
+          <article>
+            <span>Nombre</span>
+            <strong>${escapeHtml(fullName || "Sin nombre")}</strong>
+          </article>
+          <article>
+            <span>RUT</span>
+            <strong>${escapeHtml(person.identity?.rut || "Sin rut")}</strong>
+          </article>
+          <article>
+            <span>Documento</span>
+            <strong>${escapeHtml(person.identity?.document_number || "Sin documento")}</strong>
+          </article>
+          <article>
+            <span>Saldo banco</span>
+            <strong>${person.bank ? escapeHtml(formatMoney(person.bank.balance || 0)) : "Sin cuenta bancaria"}</strong>
+          </article>
+        </div>
+        <div class="staff-list-block" style="margin-top:16px;">
+          <strong>Estado general</strong>
+          <div class="staff-pill-row">
+            <span class="staff-pill ${wanted.length ? "alert" : "ok"}">${wanted.length ? "Con orden activa" : "Sin orden de busqueda"}</span>
+            <span class="staff-pill ${unpaidFines ? "alert" : "ok"}">${unpaidFines} multas impagas</span>
+            <span class="staff-pill ${backgrounds.length ? "alert" : "ok"}">${backgrounds.length} antecedentes</span>
+          </div>
+        </div>
+        <div class="staff-list-block" style="margin-top:16px;">
+          <strong>Inventario registrado</strong>
+          ${inventoryMarkup}
+        </div>
+      `;
+    }
+
+    function renderVehicle(vehicle) {
+      if (!vehicle) {
+        vehicleResultNode.innerHTML = '<p class="transaction-empty">Todavia no se ha consultado ninguna patente.</p>';
+        return;
+      }
+
+      vehicleResultNode.innerHTML = `
+        <div class="staff-detail-grid">
+          <article>
+            <span>Vehiculo</span>
+            <strong>${escapeHtml(vehicle.item_name || "Sin nombre")}</strong>
+          </article>
+          <article>
+            <span>Patente</span>
+            <strong>${escapeHtml(vehicle.plate || "Sin patente")}</strong>
+          </article>
+          <article>
+            <span>Dueno</span>
+            <strong>${escapeHtml(vehicle.owner_name || "Sin dueno")}</strong>
+          </article>
+          <article>
+            <span>RUT dueno</span>
+            <strong>${escapeHtml(vehicle.owner_identity?.rut || "Sin rut")}</strong>
+          </article>
+          <article>
+            <span>Color</span>
+            <strong>${escapeHtml(vehicle.color || "Sin registro")}</strong>
+          </article>
+          <article>
+            <span>Inscripcion</span>
+            <strong>${escapeHtml(vehicle.registration_number || "Pendiente")}</strong>
+          </article>
+        </div>
+        <div class="staff-list-block" style="margin-top:16px;">
+          <strong>Estado legal</strong>
+          <div class="staff-pill-row">
+            <span class="staff-pill ${vehicle.registered ? "ok" : "alert"}">${vehicle.registered ? "Inscrito" : "No inscrito"}</span>
+            <span class="staff-pill ${vehicle.circulation_up_to_date ? "ok" : "alert"}">${vehicle.circulation_up_to_date ? "Permiso al dia" : "Permiso vencido"}</span>
+            <span class="staff-pill ${vehicle.technical_review_up_to_date ? "ok" : "alert"}">${vehicle.technical_review_up_to_date ? "Revision al dia" : "Revision vencida"}</span>
+            <span class="staff-pill ${vehicle.impounded?.active ? "alert" : "ok"}">${vehicle.impounded?.active ? "En corrales" : "Libre"}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    document.querySelector("[data-staff-person-form]")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const identifier = String(new FormData(event.currentTarget).get("identifier") || "").trim();
+      try {
+        const response = await fetch(`/api/staff/search/person?identifier=${encodeURIComponent(identifier)}`, {
+          cache: "no-store",
+        });
+        if (!response.ok) throw new Error("person_not_found");
+        const data = await response.json();
+        renderPerson(data.person);
+        setFeedback(staffFeedback, "Consulta de persona completada.");
+      } catch {
+        renderPerson(null);
+        setFeedback(staffFeedback, "No se encontro una persona con ese nombre, RUT o documento.", true);
+      }
+    });
+
+    document.querySelector("[data-staff-vehicle-form]")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const plate = String(new FormData(event.currentTarget).get("plate") || "").trim();
+      try {
+        const response = await fetch(`/api/staff/search/vehicle?plate=${encodeURIComponent(plate)}`, {
+          cache: "no-store",
+        });
+        if (!response.ok) throw new Error("vehicle_not_found");
+        const data = await response.json();
+        renderVehicle(data.vehicle);
+        setFeedback(staffFeedback, "Consulta vehicular completada.");
+      } catch {
+        renderVehicle(null);
+        setFeedback(staffFeedback, "No se encontro un vehiculo con esa patente.", true);
+      }
+    });
+
+    (async () => {
+      const response = await fetch("/api/portal/session", { cache: "no-store" });
+      if (!response.ok) {
+        location.href = "/portal.html";
+        return;
+      }
+      const session = await response.json();
+      if (!session.permissions?.canAccessStaff) {
+        deniedView.hidden = false;
+        return;
+      }
+      allowedView.hidden = false;
+      // turnos deshabilitados para staff
+    })();
+  </script>
+</body>
+</html>
